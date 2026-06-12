@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+<p><a href="javascript:history.back()">←</a></p>
+<h1>{{ doc.filename }}</h1>
+<p class="muted">{{ doc.uploaded_at }}</p>
+<div class="card md kb-content" dir="ltr">{{ doc.text }}</div>
+{% endblock %}

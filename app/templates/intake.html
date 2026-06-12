@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ t('nav.intake') }}
+  {% if ai_on %}<span class="badge ai">{{ t('ai.enhanced') }}</span>{% endif %}</h1>
+<p class="muted">{{ t('intake.hint') }}</p>
+
+<div class="card">
+  <form class="stack" action="/api/intake" method="post" enctype="multipart/form-data">
+    <label>{{ t('label.title') }}<input type="text" name="name" required placeholder="e.g. PreOp Missing-Information Reduction"></label>
+    <label>{{ t('label.description') }}<textarea name="description"
+      placeholder="What problem does this solve, for whom, with what AI capability?"></textarea></label>
+    <label>{{ t('label.objective') }}<input type="text" name="objective"
+      placeholder="e.g. Reduce missing preoperative patient information from 18% to below 5%."></label>
+    <label>{{ t('label.phase') }}
+      <select name="phase">
+        {% for ph in ['discovery','validation','design','development','testing','pilot','production'] %}
+        <option value="{{ ph }}">{{ ph }}</option>
+        {% endfor %}
+      </select></label>
+    <label>{{ t('label.owner') }}<input type="text" name="owner"></label>
+    <label>{{ t('label.customer') }}<input type="text" name="customer"></label>
+    <label>{{ t('label.target_date') }}<input type="date" name="target_date"></label>
+    <label>{{ t('label.document') }}<input type="file" name="file" accept=".docx,.pdf,.txt,.md"></label>
+    <button type="submit">{{ t('btn.submit') }}</button>
+  </form>
+</div>
+{% endblock %}

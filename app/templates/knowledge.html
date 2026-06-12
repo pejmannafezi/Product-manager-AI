@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ t('nav.knowledge') }}</h1>
+
+<form action="/search" method="get" style="margin-bottom:18px">
+  <input type="search" name="q" placeholder="{{ t('search.placeholder') }}" style="max-width:480px">
+</form>
+
+<div class="grid cols-3">
+  {% for c in chapters %}
+  <a class="card chapter-card" href="/knowledge/chapter/{{ c.number }}">
+    <div class="chapter-num">CHAPTER {{ c.number }}</div>
+    <strong>{{ c.title }}</strong>
+    <p class="muted">{{ (c.summary or '')[:160] }}{% if c.summary and c.summary|length > 160 %}…{% endif %}</p>
+    <span class="muted">{{ c.word_count }} words</span>
+  </a>
+  {% else %}
+  <div class="card"><p class="empty">Knowledge base is empty. Run:
+    <code>python scripts/ingest_docx.py data/your-guide.docx</code></p></div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ t('nav.projects') }}</h1>
+
+<div class="grid cols-2">
+  <div class="card">
+    <table>
+      <tr><th>{{ t('label.title') }}</th><th>{{ t('label.phase') }}</th><th>{{ t('label.status') }}</th>
+          <th>{{ t('nav.tasks') }}</th><th>{{ t('compliance.score') }}</th></tr>
+      {% for p in projects %}
+      <tr>
+        <td><a href="/projects/{{ p.id }}">{{ p.name }}</a></td>
+        <td>{{ p.phase or '—' }}</td>
+        <td><span class="badge {{ 'present' if p.status == 'active' else 'gray' }}">{{ p.status }}</span></td>
+        <td>{{ p.open_tasks }}</td>
+        <td>{% if p.last_score is not none %}{{ p.last_score }}/100{% else %}—{% endif %}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="empty">{{ t('dash.none') }} <a href="/intake">{{ t('nav.intake') }} →</a></td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>{{ t('btn.add') }}</h2>
+    <form class="stack" action="/api/projects" method="post">
+      <label>{{ t('label.title') }}<input type="text" name="name" required></label>
+      <label>{{ t('label.description') }}<textarea name="description"></textarea></label>
+      <label>{{ t('label.phase') }}
+        <select name="phase">
+          {% for ph in ['discovery','validation','design','development','testing','pilot','production','monitoring','retirement'] %}
+          <option value="{{ ph }}">{{ ph }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>{{ t('label.owner') }}<input type="text" name="owner"></label>
+      <label>{{ t('label.customer') }}<input type="text" name="customer"></label>
+      <label>{{ t('label.target_date') }}<input type="date" name="target_date"></label>
+      <button type="submit">{{ t('btn.save') }}</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,4 @@
+/* Persian / RTL adjustments. app.css uses logical properties, so this stays small. */
+body { font-family: "Vazirmatn", Tahoma, "Segoe UI", system-ui, sans-serif; }
+.kb-content, .md, .inline-search input { direction: ltr; text-align: left; }
+.topbar nav a { font-size: 13.5px; }
