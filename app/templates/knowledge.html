@@ -6,6 +6,15 @@
   <input type="search" name="q" placeholder="{{ t('search.placeholder') }}" style="max-width:480px">
 </form>
 
+<details class="card" style="margin-bottom:18px">
+  <summary>{{ t('kb.import') }}</summary>
+  <p class="muted">{{ t('kb.import_hint') }}</p>
+  <form action="/api/knowledge/import" method="post" enctype="multipart/form-data" class="stack">
+    <input type="file" name="file" accept=".docx" required>
+    <button type="submit">{{ t('kb.import_btn') }}</button>
+  </form>
+</details>
+
 <div class="grid cols-3">
   {% for c in chapters %}
   <a class="card chapter-card" href="/knowledge/chapter/{{ c.number }}">

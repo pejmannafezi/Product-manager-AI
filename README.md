@@ -58,6 +58,19 @@ any failure, and the UI shows an "AI-enhanced" badge when used):
 English by default; click **فارسی** in the top bar for a Persian RTL interface.
 Knowledge-base content stays English (rendered LTR inside the RTL layout).
 
+## Sharing with your team
+
+- **Office network:** `python run.py --host 0.0.0.0`, then colleagues open
+  `http://<your-ip>:8000`.
+- **Internet (Render):** the repo ships a `render.yaml` blueprint. On
+  [render.com](https://render.com): *New + → Blueprint → connect this repo →
+  Apply*. Set the `PMAI_PASSWORD` environment variable — when it is set, every
+  page requires that password (when unset, e.g. locally, there is no login).
+  After deploying, open *Knowledge → Import guide* and upload the guide docx
+  through the browser to populate the library.
+
+Do not put real patient or confidential data on a shared demo deployment.
+
 ## Docker
 
 ```bash

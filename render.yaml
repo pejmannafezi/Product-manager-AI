@@ -1,0 +1,19 @@
+# One-click deployment blueprint for https://render.com
+# In Render: New + -> Blueprint -> connect this repository.
+services:
+  - type: web
+    name: ai-pm-command-center
+    runtime: docker
+    plan: free
+    envVars:
+      - key: PMAI_PASSWORD          # required: the shared password for your team
+        sync: false
+      - key: ANTHROPIC_API_KEY      # optional: enables AI-enhanced agents
+        sync: false
+    # NOTE: the free plan has no persistent disk, so the database resets when
+    # the service restarts (fine for demos). For real use, switch to a paid
+    # plan and uncomment:
+    # disk:
+    #   name: data
+    #   mountPath: /app/data
+    #   sizeGB: 1

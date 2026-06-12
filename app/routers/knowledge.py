@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, File, Request, UploadFile
 from fastapi.responses import RedirectResponse
 
+from app import config
 from app.agents.knowledge import KnowledgeAgent
 from app.db import get_db
 from app.services.ai import get_ai
@@ -13,6 +14,18 @@ router = APIRouter()
 def knowledge(request: Request, conn=Depends(get_db)):
     agent = KnowledgeAgent(conn, get_ai())
     return render(request, "knowledge.html", chapters=agent.chapters())
+
+
+@router.post("/api/knowledge/import")
+async def import_guide(file: UploadFile = File(...)):
+    """Import/replace the guide docx through the browser, so deployed instances
+    can be populated without shell access."""
+    from scripts.ingest_docx import ingest
+    config.DATA_DIR.mkdir(parents=True, exist_ok=True)
+    path = config.DATA_DIR / "ai-pm-guide.docx"
+    path.write_bytes(await file.read())
+    ingest(path, replace=True)
+    return RedirectResponse("/knowledge", status_code=303)
 
 
 @router.get("/knowledge/chapter/{number}")
