@@ -68,6 +68,10 @@ main { max-width: 1180px; margin: 24px auto; padding: 0 20px; }
 h1 { font-size: 24px; margin: 8px 0 16px; letter-spacing: -.01em; }
 h2 { font-size: 18px; margin: 18px 0 10px; }
 
+/* inline SVG icon set (see templates/_icons.html) */
+.icon { width: 1.05em; height: 1.05em; vertical-align: -.16em; margin-inline-end: .42em; flex: none; }
+h1 .icon, h2 .icon { color: var(--brand); }
+
 .grid { display: grid; gap: 16px; }
 .grid.cols-2 { grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
 .grid.cols-3 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
@@ -107,12 +111,15 @@ ul.clean li:last-child { border-bottom: none; }
 
 form.stack { display: grid; gap: 10px; max-width: 640px; }
 form.stack label { font-weight: 600; font-size: 13px; }
-input[type=text], input[type=date], input[type=search], select, textarea {
+input[type=text], input[type=date], input[type=search], input[type=password],
+input[type=email], input[type=number], input[type=tel], select, textarea {
   width: 100%; padding: 9px 11px; border: 1px solid var(--line);
   border-radius: 8px; font: inherit; background: #fff; color: var(--ink);
   transition: border-color var(--ease), box-shadow var(--ease);
 }
-input[type=text]:focus, input[type=date]:focus, input[type=search]:focus, select:focus, textarea:focus {
+input[type=text]:focus, input[type=date]:focus, input[type=search]:focus,
+input[type=password]:focus, input[type=email]:focus, input[type=number]:focus,
+input[type=tel]:focus, select:focus, textarea:focus {
   outline: none; border-color: var(--brand); box-shadow: var(--ring);
 }
 textarea { min-height: 90px; }

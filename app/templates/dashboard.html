@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
 {% block content %}
 <h1>{{ t('nav.dashboard') }}
   {% if ai_on %}<span class="badge ai">{{ t('ai.enhanced') }}</span>
@@ -13,7 +14,7 @@
 
 <div class="grid cols-2">
   <div class="card">
-    <h2>⭐ {{ t('dash.top3') }}</h2>
+    <h2>{{ icon('star') }}{{ t('dash.top3') }}</h2>
     {% if focus.top3 %}
     <ul class="clean">
       {% for task in focus.top3 %}
@@ -31,7 +32,7 @@
   </div>
 
   <div class="card">
-    <h2>⏰ {{ t('dash.overdue') }} ({{ focus.overdue | length }})</h2>
+    <h2>{{ icon('clock') }}{{ t('dash.overdue') }} ({{ focus.overdue | length }})</h2>
     {% if focus.overdue %}
     <ul class="clean">
       {% for task in focus.overdue %}
@@ -43,7 +44,7 @@
   </div>
 
   <div class="card">
-    <h2>🚧 {{ t('dash.blockers') }} ({{ focus.blockers | length }})</h2>
+    <h2>{{ icon('ban') }}{{ t('dash.blockers') }} ({{ focus.blockers | length }})</h2>
     {% if focus.blockers %}
     <ul class="clean">
       {% for b in focus.blockers %}
@@ -55,7 +56,7 @@
   </div>
 
   <div class="card">
-    <h2>⚠️ {{ t('dash.risks') }} (score ≥ 15)</h2>
+    <h2>{{ icon('alert-triangle') }}{{ t('dash.risks') }} (score ≥ 15)</h2>
     {% if focus.risks %}
     <ul class="clean">
       {% for r in focus.risks %}
@@ -67,7 +68,7 @@
   </div>
 
   <div class="card">
-    <h2>🧩 {{ t('dash.decisions') }} ({{ focus.decisions | length }})</h2>
+    <h2>{{ icon('git-branch') }}{{ t('dash.decisions') }} ({{ focus.decisions | length }})</h2>
     {% if focus.decisions %}
     <ul class="clean">
       {% for d in focus.decisions %}
@@ -78,7 +79,7 @@
   </div>
 
   <div class="card">
-    <h2>🔥 {{ t('dash.issues') }} ({{ focus.issues | length }})</h2>
+    <h2>{{ icon('flame') }}{{ t('dash.issues') }} ({{ focus.issues | length }})</h2>
     {% if focus.issues %}
     <ul class="clean">
       {% for i in focus.issues %}
@@ -92,7 +93,7 @@
 
 <div class="grid cols-2" style="margin-top:16px">
   <div class="card">
-    <h2>✅ {{ t('dash.' + period) }} — {{ checklist.key }}
+    <h2>{{ icon('check-circle') }}{{ t('dash.' + period) }} — {{ checklist.key }}
       <span class="muted">{{ checklist.done }}/{{ checklist.total }}</span></h2>
     <div class="progressbar"><div style="width: {{ (100 * checklist.done / checklist.total) | round if checklist.total else 0 }}%"></div></div>
     {% for section, items in checklist.sections.items() %}
@@ -110,7 +111,7 @@
   </div>
 
   <div class="card">
-    <h2>🤖 {{ t('dash.activity') }}</h2>
+    <h2>{{ icon('bot') }}{{ t('dash.activity') }}</h2>
     <ul class="clean feed">
       {% for e in events %}
       <li><span class="agent-name agent-{{ e.agent }}">{{ e.agent }}</span>

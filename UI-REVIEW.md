@@ -74,6 +74,16 @@ real accessibility gaps. The review focused on the highest-impact issues first.
 
 ---
 
+## Follow-up: emoji → SVG icons (done)
+
+The dashboard, intake-result, and login pages used emoji as section icons
+(⭐ ⏰ 🚧 ⚠️ 🧩 🔥 ✅ 🤖 📚 🗺️ 🧭 🔒), which the `no-emoji-icons` rule flags as
+font-dependent and non-theme-able. Added a reusable Jinja macro
+(`app/templates/_icons.html`) that renders a single, consistent Lucide-style SVG
+set inheriting `currentColor`, and replaced every emoji with `{{ icon('…') }}`.
+Header icons are tinted with the brand color via `h1 .icon, h2 .icon`. Verified
+in-browser; no emoji remain in any template; full suite still 21 passed.
+
 ## Deliberately left out (recommended next steps)
 
 These are worthwhile but bigger than a styling pass and need visual testing:
