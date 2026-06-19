@@ -240,3 +240,77 @@ CREATE TABLE IF NOT EXISTS agent_events (
   payload TEXT,                          -- JSON
   created_at TEXT DEFAULT (datetime('now'))
 );
+
+-- ---------------------------------------------------------------------------
+-- Reference Library: extra documents/information the agents consult.
+--   scope='global'  -> every agent uses it in every action (all projects)
+--   scope='project' -> only used while working on that one project_id
+-- Long references are chunked + FTS-indexed for relevance retrieval (RAG);
+-- short ones are injected in full. enabled=0 keeps a reference without using it.
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS reference_docs (
+  id INTEGER PRIMARY KEY,
+  scope TEXT NOT NULL DEFAULT 'global',  -- global|project
+  project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE,  -- NULL when global
+  title TEXT NOT NULL,
+  filename TEXT,
+  mime TEXT,
+  text TEXT,
+  char_count INTEGER DEFAULT 0,
+  enabled INTEGER DEFAULT 1,
+  created_at TEXT DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS reference_chunks (
+  id INTEGER PRIMARY KEY,
+  reference_id INTEGER REFERENCES reference_docs(id) ON DELETE CASCADE,
+  scope TEXT,
+  project_id INTEGER,                    -- denormalized for fast scope filtering
+  heading TEXT,
+  content TEXT,
+  order_index INTEGER DEFAULT 0
+);
+
+CREATE VIRTUAL TABLE IF NOT EXISTS ref_fts USING fts5(
+  heading, content,
+  content='reference_chunks', content_rowid='id',
+  tokenize='porter'
+);
+
+CREATE TRIGGER IF NOT EXISTS reference_chunks_ai AFTER INSERT ON reference_chunks BEGIN
+  INSERT INTO ref_fts(rowid, heading, content) VALUES (new.id, new.heading, new.content);
+END;
+CREATE TRIGGER IF NOT EXISTS reference_chunks_ad AFTER DELETE ON reference_chunks BEGIN
+  INSERT INTO ref_fts(ref_fts, rowid, heading, content) VALUES ('delete', old.id, old.heading, old.content);
+END;
+CREATE TRIGGER IF NOT EXISTS reference_chunks_au AFTER UPDATE ON reference_chunks BEGIN
+  INSERT INTO ref_fts(ref_fts, rowid, heading, content) VALUES ('delete', old.id, old.heading, old.content);
+  INSERT INTO ref_fts(rowid, heading, content) VALUES (new.id, new.heading, new.content);
+END;
+
+-- ---------------------------------------------------------------------------
+-- Planning artifacts produced by the AI Planning Engine (with rule-based
+-- fallback): milestones and a dated deliverables schedule per project.
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS milestones (
+  id INTEGER PRIMARY KEY,
+  project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  description TEXT,
+  due_date TEXT,
+  status TEXT DEFAULT 'planned',         -- planned|in_progress|done|missed
+  order_index INTEGER DEFAULT 0,
+  created_at TEXT DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS deliverables (
+  id INTEGER PRIMARY KEY,
+  project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  description TEXT,
+  owner TEXT,
+  due_date TEXT,
+  status TEXT DEFAULT 'planned',         -- planned|in_progress|done
+  order_index INTEGER DEFAULT 0,
+  created_at TEXT DEFAULT (datetime('now'))
+);

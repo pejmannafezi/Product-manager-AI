@@ -77,9 +77,35 @@ class ExecutionAgent(BaseAgent):
                 "VALUES (?,?,?,?,?)",
                 (instance_id, t["id"], t["section"], t["item_text"], t["order_index"]),
             )
+        carried = self._carry_forward(period, project_id, key, instance_id)
         self.log_event("checklist_generated", "checklist_instance", instance_id,
-                       f"Generated {period} checklist ({key})")
+                       f"Generated {period} checklist ({key})"
+                       + (f"; carried {carried} unfinished item(s) forward" if carried else ""))
         return instance_id
+
+    def _carry_forward(self, period: str, project_id, current_key: str, instance_id: int) -> int:
+        """Move incomplete ad-hoc items (template_id IS NULL) from the most recent
+        prior period of the same scope into this new instance, flagged carried_over.
+        Recurring template items regenerate fresh each period, so only custom/carried
+        items roll forward — matching the daily→next-day / weekly / monthly rule."""
+        prev = self.db.execute(
+            "SELECT id FROM checklist_instances WHERE period=? AND project_id IS ? AND period_key < ? "
+            "ORDER BY period_key DESC LIMIT 1", (period, project_id, current_key),
+        ).fetchone()
+        if not prev:
+            return 0
+        unfinished = self.db.execute(
+            "SELECT section, text, note, order_index FROM checklist_items "
+            "WHERE instance_id=? AND done=0 AND template_id IS NULL ORDER BY order_index",
+            (prev["id"],),
+        ).fetchall()
+        for it in unfinished:
+            self.db.execute(
+                "INSERT INTO checklist_items(instance_id, template_id, section, text, note, "
+                "order_index, carried_over) VALUES (?,?,?,?,?,?,1)",
+                (instance_id, None, it["section"], it["text"], it["note"], it["order_index"]),
+            )
+        return len(unfinished)
 
     # ---------- tasks from compliance gaps ----------
     def create_tasks_from_gaps(self, report_id: int) -> list[int]:
@@ -134,13 +160,16 @@ class ExecutionAgent(BaseAgent):
             return []
         items = ROADMAP_TEMPLATE
         if self.ai.available:
+            context = self.reference_context(f"{project_name} {description}", project_id)
             raw = self.ai.complete(
                 "You generate AI product roadmaps for a healthcare AI product manager who prioritizes "
                 "safety, traceability, human review, and regulatory compliance. Reply ONLY with JSON: "
                 '{"now": [["title","description"],...], "next": [...], "later": [...]} '
                 "with exactly 3 items per horizon.",
-                f"Project: {project_name}\nDescription: {description}\n"
-                f"Base template to personalize: {json.dumps(items)}",
+                self._with_context(
+                    context,
+                    f"Project: {project_name}\nDescription: {description}\n"
+                    f"Base template to personalize: {json.dumps(items)}"),
                 max_tokens=1500,
             )
             if raw:
@@ -244,6 +273,9 @@ class ExecutionAgent(BaseAgent):
         issue = self.db.execute("SELECT * FROM issues WHERE id=?", (issue_id,)).fetchone()
         if not issue or not self.ai.available:
             return None
+        context = self.reference_context(
+            f"{issue['title']} {issue['affected_area'] or ''} {issue['description'] or ''}",
+            issue["project_id"])
         result = self.ai.complete(
             "You are an AI PM problem-solving assistant for governed healthcare AI products. "
             "Given an issue, produce: (1) a clear problem statement in the format "
@@ -254,9 +286,11 @@ class ExecutionAgent(BaseAgent):
             "containment, investigation steps, corrective and preventive actions with suggested owners "
             "and verification methods. Never invent facts; mark missing information explicitly. "
             "Use concise markdown.",
-            f"Issue title: {issue['title']}\nSeverity: {issue['severity']}\n"
-            f"Affected area: {issue['affected_area'] or 'unknown'}\n"
-            f"Description: {issue['description'] or '(none provided)'}",
+            self._with_context(
+                context,
+                f"Issue title: {issue['title']}\nSeverity: {issue['severity']}\n"
+                f"Affected area: {issue['affected_area'] or 'unknown'}\n"
+                f"Description: {issue['description'] or '(none provided)'}"),
             max_tokens=2500,
         )
         if result:

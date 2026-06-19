@@ -17,9 +17,18 @@
         <option value="{{ ph }}">{{ ph }}</option>
         {% endfor %}
       </select></label>
+    <label>{{ t('label.requirements') }}<textarea name="requirements"
+      placeholder="Key requirements, constraints, must-haves (e.g. human-in-the-loop, HIPAA)."></textarea></label>
+    <label>{{ t('label.stakeholders') }}<textarea name="stakeholders"
+      placeholder="Owners, approvers, users, reviewers."></textarea></label>
+    <label>{{ t('label.deliverables') }}<textarea name="deliverables"
+      placeholder="One deliverable per line — the engine schedules their dates."></textarea></label>
     <label>{{ t('label.owner') }}<input type="text" name="owner"></label>
     <label>{{ t('label.customer') }}<input type="text" name="customer"></label>
-    <label>{{ t('label.target_date') }}<input type="date" name="target_date"></label>
+    <div class="grid cols-2">
+      <label>{{ t('label.start_date') }}<input type="date" name="start_date"></label>
+      <label>{{ t('label.target_date') }}<input type="date" name="target_date"></label>
+    </div>
     <label>{{ t('label.document') }}<input type="file" name="file" accept=".docx,.pdf,.txt,.md"></label>
     <button type="submit">{{ t('btn.submit') }}</button>
   </form>

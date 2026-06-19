@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from app import config, db, i18n
 from app.auth import auth_middleware
 from app.routers import (checklists, compliance, dashboard, intake, issues,
-                         knowledge, pages, projects, tasks)
+                         knowledge, pages, projects, refs, tasks)
 from app.seed import run_seeds
 
 
@@ -40,5 +40,5 @@ app = FastAPI(title="AI PM Command Center", lifespan=lifespan)
 app.middleware("http")(auth_middleware)
 app.mount("/static", StaticFiles(directory=str(config.STATIC_DIR)), name="static")
 
-for r in (dashboard, projects, tasks, checklists, knowledge, compliance, issues, intake, pages):
+for r in (dashboard, projects, tasks, checklists, knowledge, refs, compliance, issues, intake, pages):
     app.include_router(r.router)

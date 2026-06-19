@@ -126,3 +126,38 @@ mark { background: #fde68a; padding: 0 2px; border-radius: 3px; }
   padding: 10px 14px; border-radius: 8px; margin-bottom: 14px;
 }
 details summary { cursor: pointer; font-weight: 600; }
+
+/* ---- progress summary ---- */
+.progressbar > span { display: block; background: linear-gradient(90deg, var(--brand), var(--brand-2)); height: 100%; }
+.progress-summary { margin: 10px 0 4px; }
+.progress-stats { font-size: 13px; color: var(--muted); margin-top: 6px; }
+.danger { color: var(--red); }
+
+/* ---- checklist carried-forward ---- */
+.check-item.carried > span::after {
+  content: "↪ carried"; margin-inline-start: 8px; font-size: 11px; font-weight: 700;
+  color: var(--amber); background: #fef3c7; padding: 1px 7px; border-radius: 999px;
+}
+
+/* ---- dependency-free Gantt ---- */
+.gantt { position: relative; }
+.gantt-group { font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--muted); margin: 14px 0 6px; }
+.gantt-row { display: grid; grid-template-columns: 180px 1fr 92px; align-items: center; gap: 10px; padding: 3px 0; }
+.gantt-label { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gantt-track { position: relative; height: 16px; background: #eef0f7; border-radius: 999px; }
+.gantt-bar { position: absolute; top: 0; height: 16px; min-width: 6px; border-radius: 999px; opacity: .92; }
+.gantt-bar.milestone   { background: var(--brand-2); }
+.gantt-bar.deliverable { background: var(--green); }
+.gantt-bar.task        { background: var(--brand); }
+.gantt-bar.critical    { background: var(--red); box-shadow: 0 0 0 2px #fecaca; }
+.gantt-bar.is-done     { opacity: .45; }
+.gantt-due { font-size: 12px; color: var(--muted); text-align: end; }
+.gantt-today { position: absolute; top: 22px; bottom: 0; width: 2px; background: var(--amber); z-index: 2; }
+.gantt-legend { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-top: 14px; font-size: 12px; }
+.gantt-legend .dot { display: inline-block; width: 12px; height: 12px; border-radius: 4px; margin-inline-end: 5px; vertical-align: -1px; }
+.gantt-legend .dot.milestone { background: var(--brand-2); }
+.gantt-legend .dot.deliverable { background: var(--green); }
+.gantt-legend .dot.task { background: var(--brand); }
+.gantt-legend .dot.critical { background: var(--red); }
+html[dir="rtl"] .gantt-bar { left: auto; }

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import RedirectResponse
 
 from app.agents.execution import ExecutionAgent
@@ -38,4 +38,24 @@ def toggle_item(item_id: int, conn=Depends(get_db)):
 def generate(period: str = "daily", conn=Depends(get_db)):
     agent = ExecutionAgent(conn, get_ai())
     instance_id = agent.ensure_checklist(period)
+    return RedirectResponse(f"/checklists?period={period}", status_code=303)
+
+
+@router.post("/api/checklist-items/add")
+def add_item(period: str = Form("daily"), text: str = Form(...),
+             section: str = Form("My Tasks"), conn=Depends(get_db)):
+    """Add an ad-hoc item to the current period's checklist. Ad-hoc items
+    (template_id IS NULL) are the ones that carry forward when left unfinished."""
+    if period not in ("daily", "weekly", "monthly"):
+        period = "daily"
+    text = text.strip()
+    if text:
+        agent = ExecutionAgent(conn, get_ai())
+        instance_id = agent.ensure_checklist(period)
+        nxt = conn.execute(
+            "SELECT COALESCE(MAX(order_index), 0) + 1 AS n FROM checklist_items WHERE instance_id=?",
+            (instance_id,)).fetchone()["n"]
+        conn.execute(
+            "INSERT INTO checklist_items(instance_id, template_id, section, text, order_index) "
+            "VALUES (?,?,?,?,?)", (instance_id, None, section, text, nxt))
     return RedirectResponse(f"/checklists?period={period}", status_code=303)

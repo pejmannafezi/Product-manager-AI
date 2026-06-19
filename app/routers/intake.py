@@ -18,14 +18,17 @@ def intake_form(request: Request, conn=Depends(get_db)):
 
 @router.post("/api/intake")
 async def run_intake(name: str = Form(...), description: str = Form(""),
-                     phase: str = Form("discovery"), target_date: str = Form(""),
-                     owner: str = Form(""), customer: str = Form(""), objective: str = Form(""),
+                     phase: str = Form("discovery"), start_date: str = Form(""),
+                     target_date: str = Form(""), owner: str = Form(""), customer: str = Form(""),
+                     objective: str = Form(""), requirements: str = Form(""),
+                     stakeholders: str = Form(""), deliverables: str = Form(""),
                      file: UploadFile | None = File(None), conn=Depends(get_db)):
     data = await file.read() if file and file.filename else b""
     orch = Orchestrator(conn, get_ai())
     result = orch.run_intake(name=name, description=description, phase=phase,
-                             target_date=target_date, owner=owner, customer=customer,
-                             objective=objective,
+                             start_date=start_date, target_date=target_date, owner=owner,
+                             customer=customer, objective=objective, requirements=requirements,
+                             stakeholders=stakeholders, deliverables=deliverables,
                              filename=file.filename if file else "", file_bytes=data)
     url = f"/intake/result/{result['project_id']}"
     if result.get("doc_error"):

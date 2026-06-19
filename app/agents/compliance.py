@@ -153,14 +153,21 @@ class ComplianceAgent(BaseAgent):
         rules_by_id = {r["id"]: r for r in self.db.execute("SELECT * FROM compliance_rules").fetchall()}
         finding_lines = "\n".join(
             f"- {rules_by_id[f['rule_id']]['name']}: {f['status']}" for f in findings)
+        report = self.db.execute(
+            "SELECT project_id FROM compliance_reports WHERE id=?", (report_id,)).fetchone()
+        context = self.reference_context(
+            f"{finding_lines}\n{text[:1000]}", report["project_id"] if report else None)
         result = self.ai.complete(
             "You are a compliance reviewer for governed healthcare AI products. Given a rule-based "
             "artifact checklist result and a document excerpt, write: (1) a one-paragraph executive "
             "summary of the document's readiness; (2) any findings that look like false positives or "
             "false negatives, with the evidence; (3) the 3 most important project-specific actions. "
             "Concise markdown, no preamble.",
-            f"Rule-based result: grade {grade}, score {score}/100.\nFindings:\n{finding_lines}\n\n"
-            f"Document excerpt (first 8000 chars):\n{text[:8000]}",
+            self._with_context(
+                context,
+                f"Rule-based result: grade {grade}, score {score}/100.\nFindings:\n{finding_lines}\n\n"
+                f"Document excerpt (first 8000 chars):\n{text[:8000]}",
+            ),
             max_tokens=1500,
         )
         if result:

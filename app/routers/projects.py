@@ -3,7 +3,10 @@ import json
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import RedirectResponse
 
+from app.agents.planning import PlanningAgent
 from app.db import get_db
+from app.services import schedule
+from app.services.ai import get_ai
 from app.web import render
 
 router = APIRouter()
@@ -14,6 +17,8 @@ def projects(request: Request, conn=Depends(get_db)):
     rows = conn.execute(
         """SELECT p.*,
                   (SELECT COUNT(*) FROM tasks t WHERE t.project_id=p.id AND t.status!='done') AS open_tasks,
+                  (SELECT COUNT(*) FROM tasks t WHERE t.project_id=p.id) AS total_tasks,
+                  (SELECT COUNT(*) FROM tasks t WHERE t.project_id=p.id AND t.status='done') AS done_tasks,
                   (SELECT MAX(score) FROM compliance_reports r WHERE r.project_id=p.id) AS last_score
            FROM projects p ORDER BY p.created_at DESC"""
     ).fetchall()
@@ -22,12 +27,14 @@ def projects(request: Request, conn=Depends(get_db)):
 
 @router.post("/api/projects")
 def create_project(name: str = Form(...), description: str = Form(""), phase: str = Form("discovery"),
-                   owner: str = Form(""), customer: str = Form(""), target_date: str = Form(""),
-                   conn=Depends(get_db)):
+                   owner: str = Form(""), customer: str = Form(""), start_date: str = Form(""),
+                   target_date: str = Form(""), objective: str = Form(""), requirements: str = Form(""),
+                   stakeholders: str = Form(""), conn=Depends(get_db)):
     cur = conn.execute(
-        "INSERT INTO projects(name, description, status, phase, owner, customer, target_date) "
-        "VALUES (?,?,?,?,?,?,?)",
-        (name, description, "active", phase, owner, customer, target_date or None),
+        "INSERT INTO projects(name, description, status, phase, owner, customer, objective, "
+        "start_date, target_date, requirements, stakeholders) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+        (name, description, "active", phase, owner, customer, objective or None,
+         start_date or None, target_date or None, requirements or None, stakeholders or None),
     )
     return RedirectResponse(f"/projects/{cur.lastrowid}", status_code=303)
 
@@ -39,17 +46,35 @@ def set_status(project_id: int, status: str = Form(...), phase: str = Form(""), 
     return RedirectResponse(f"/projects/{project_id}", status_code=303)
 
 
+@router.post("/api/projects/{project_id}/regenerate-plan")
+def regenerate_plan(project_id: int, conn=Depends(get_db)):
+    project = conn.execute("SELECT * FROM projects WHERE id=?", (project_id,)).fetchone()
+    if project:
+        PlanningAgent(conn, get_ai()).regenerate(project)
+    return RedirectResponse(f"/projects/{project_id}?tab=plan", status_code=303)
+
+
 @router.get("/projects/{project_id}")
 def project_detail(request: Request, project_id: int, tab: str = "tasks", conn=Depends(get_db)):
     project = conn.execute("SELECT * FROM projects WHERE id=?", (project_id,)).fetchone()
     if not project:
         return RedirectResponse("/projects", status_code=303)
-    ctx = {"project": project, "tab": tab}
+    ctx = {"project": project, "tab": tab, "stats": schedule.project_stats(conn, project_id)}
     if tab == "tasks":
         ctx["tasks"] = conn.execute(
             "SELECT * FROM tasks WHERE project_id=? ORDER BY status='done', "
             "CASE priority WHEN 'high' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END, due_date",
             (project_id,)).fetchall()
+    elif tab == "plan":
+        ctx["milestones"] = conn.execute(
+            "SELECT * FROM milestones WHERE project_id=? ORDER BY order_index", (project_id,)).fetchall()
+        ctx["deliverables"] = conn.execute(
+            "SELECT * FROM deliverables WHERE project_id=? ORDER BY due_date, order_index",
+            (project_id,)).fetchall()
+        ctx["risks"] = conn.execute(
+            "SELECT * FROM risks WHERE project_id=? ORDER BY score DESC", (project_id,)).fetchall()
+    elif tab == "timeline":
+        ctx["timeline"] = schedule.timeline_bars(conn, project)
     elif tab == "roadmap":
         items = conn.execute(
             "SELECT * FROM roadmap_items WHERE project_id=? ORDER BY order_index", (project_id,)).fetchall()

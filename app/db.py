@@ -16,10 +16,28 @@ def connect() -> sqlite3.Connection:
     return conn
 
 
+# Columns added to pre-existing tables after their original CREATE. SQLite has no
+# "ADD COLUMN IF NOT EXISTS", so init_db() adds any that are missing (idempotent).
+_COLUMN_MIGRATIONS = {
+    "projects": [("requirements", "TEXT"), ("stakeholders", "TEXT"), ("resourcing", "TEXT")],
+    "tasks": [("depends_on", "TEXT"), ("is_critical", "INTEGER DEFAULT 0"), ("milestone_id", "INTEGER")],
+    "checklist_items": [("carried_over", "INTEGER DEFAULT 0")],
+}
+
+
+def _ensure_columns(conn):
+    for table, cols in _COLUMN_MIGRATIONS.items():
+        existing = {r["name"] for r in conn.execute(f"PRAGMA table_info({table})")}
+        for name, decl in cols:
+            if name not in existing:
+                conn.execute(f"ALTER TABLE {table} ADD COLUMN {name} {decl}")
+
+
 def init_db():
     conn = connect()
     try:
         conn.executescript(config.SCHEMA_PATH.read_text(encoding="utf-8"))
+        _ensure_columns(conn)
         conn.commit()
     finally:
         conn.close()

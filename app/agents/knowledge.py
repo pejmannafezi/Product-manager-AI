@@ -15,10 +15,11 @@ class KnowledgeAgent(BaseAgent):
         results = search_svc.search_sections(self.db, query, limit)
         ai_used = False
         if deep and self.ai.available:
+            context = self.reference_context(query, project_id=None, max_chars=1500)
             expansion = self.ai.complete(
                 "You expand search queries for an AI Product Management knowledge base. "
                 "Reply with 5-8 related search terms only, comma-separated, no explanation.",
-                f"Query: {query}",
+                self._with_context(context, f"Query: {query}"),
                 max_tokens=100,
             )
             if expansion:

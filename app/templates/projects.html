@@ -6,17 +6,22 @@
   <div class="card">
     <table>
       <tr><th>{{ t('label.title') }}</th><th>{{ t('label.phase') }}</th><th>{{ t('label.status') }}</th>
-          <th>{{ t('nav.tasks') }}</th><th>{{ t('compliance.score') }}</th></tr>
+          <th>{{ t('project.complete') }}</th><th>{{ t('nav.tasks') }}</th><th>{{ t('compliance.score') }}</th></tr>
       {% for p in projects %}
+      {% set pct = (100 * p.done_tasks / p.total_tasks) | round if p.total_tasks else 0 %}
       <tr>
         <td><a href="/projects/{{ p.id }}">{{ p.name }}</a></td>
         <td>{{ p.phase or '—' }}</td>
         <td><span class="badge {{ 'present' if p.status == 'active' else 'gray' }}">{{ p.status }}</span></td>
+        <td style="min-width:120px">
+          <div class="progressbar"><span style="width:{{ pct }}%"></span></div>
+          <span class="muted" style="font-size:12px">{{ pct }}%</span>
+        </td>
         <td>{{ p.open_tasks }}</td>
         <td>{% if p.last_score is not none %}{{ p.last_score }}/100{% else %}—{% endif %}</td>
       </tr>
       {% else %}
-      <tr><td colspan="5" class="empty">{{ t('dash.none') }} <a href="/intake">{{ t('nav.intake') }} →</a></td></tr>
+      <tr><td colspan="6" class="empty">{{ t('dash.none') }} <a href="/intake">{{ t('nav.intake') }} →</a></td></tr>
       {% endfor %}
     </table>
   </div>
@@ -33,9 +38,15 @@
           {% endfor %}
         </select>
       </label>
+      <label>{{ t('label.objective') }}<input type="text" name="objective"></label>
+      <label>{{ t('label.requirements') }}<textarea name="requirements"></textarea></label>
+      <label>{{ t('label.stakeholders') }}<textarea name="stakeholders"></textarea></label>
       <label>{{ t('label.owner') }}<input type="text" name="owner"></label>
       <label>{{ t('label.customer') }}<input type="text" name="customer"></label>
-      <label>{{ t('label.target_date') }}<input type="date" name="target_date"></label>
+      <div class="grid cols-2">
+        <label>{{ t('label.start_date') }}<input type="date" name="start_date"></label>
+        <label>{{ t('label.target_date') }}<input type="date" name="target_date"></label>
+      </div>
       <button type="submit">{{ t('btn.save') }}</button>
     </form>
   </div>
