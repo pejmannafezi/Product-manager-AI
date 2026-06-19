@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}{{ project.name }} · {{ t('app.title') }}{% endblock %}
 {% block content %}
 <h1>{{ project.name }}
   <span class="badge {{ 'present' if project.status == 'active' else 'gray' }}">{{ project.status }}</span>

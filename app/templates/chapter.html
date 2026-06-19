@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Chapter {{ chapter.number }} — {{ chapter.title }}{% endblock %}
+{% block title %}Chapter {{ chapter.number }}: {{ chapter.title }} · {{ t('app.title') }}{% endblock %}
 {% block content %}
 <p><a href="/knowledge">← {{ t('nav.knowledge') }}</a></p>
 <h1>Chapter {{ chapter.number }}: {{ chapter.title }}</h1>

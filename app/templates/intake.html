@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}{{ t('nav.intake') }} · {{ t('app.title') }}{% endblock %}
 {% block content %}
 <h1>{{ t('nav.intake') }}
   {% if ai_on %}<span class="badge ai">{{ t('ai.enhanced') }}</span>{% endif %}</h1>

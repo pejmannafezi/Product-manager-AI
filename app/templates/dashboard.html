@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% from "_icons.html" import icon %}
+{% block title %}{{ t('nav.dashboard') }} · {{ t('app.title') }}{% endblock %}
 {% block content %}
 <h1>{{ t('nav.dashboard') }}
   {% if ai_on %}<span class="badge ai">{{ t('ai.enhanced') }}</span>

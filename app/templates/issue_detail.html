@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}{{ issue.title }} · {{ t('app.title') }}{% endblock %}
 {% block content %}
 <p><a href="/issues">← {{ t('nav.issues') }}</a></p>
 <h1><span class="badge {{ issue.severity }}">{{ issue.severity }}</span> {{ issue.title }}

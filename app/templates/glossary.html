@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}{{ t('nav.glossary') }} · {{ t('app.title') }}{% endblock %}
 {% block content %}
 <h1>{{ t('nav.glossary') }}</h1>
 <form action="/glossary" method="get" style="margin-bottom:14px">

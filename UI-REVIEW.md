@@ -117,6 +117,16 @@ Added translation keys `a11y.skip` and `a11y.menu` (EN + FA).
   plan generation). Skips cancelled `confirm()` submits and `data-noloading`
   forms; honors reduced-motion. Verified in-browser; suite 21 passed.
 
+## Follow-up v4: professional finish (done)
+
+- **Favicon + theme-color** — added an SVG app icon (`static/favicon.svg`, the
+  brand compass on an indigo tile) and a `theme-color` meta; browsers previously
+  showed a blank default icon.
+- **Per-page `<title>`** — every page now sets a descriptive title
+  ("Projects · AI PM Command Center", project/issue/chapter names on detail
+  pages) instead of all tabs reading the same app name. Verified across 11+ routes;
+  suite 21 passed.
+
 ## Still recommended (next steps)
 
 - Convert remaining in-content emoji if any new ones surface (dashboard, intake,
