@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AI PM Command Center — A Simple Guide</title>
+<style>
+  :root { --brand:#4f46e5; --ink:#1d2433; --muted:#5b6175; --line:#e3e6ef; --fill:#f5f6fa; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+    color: var(--ink); line-height: 1.55; margin: 0; font-size: 12.5px; }
+  .page { max-width: 820px; margin: 0 auto; padding: 0 8px; }
+
+  /* cover */
+  .cover { text-align: center; padding: 60px 20px 36px; border-bottom: 3px solid var(--brand); margin-bottom: 26px; }
+  .logo { width: 64px; height: 64px; margin: 0 auto 16px; display: block; }
+  .cover h1 { font-size: 30px; margin: 0 0 8px; letter-spacing: -.01em; }
+  .cover .sub { color: var(--muted); font-size: 15px; margin: 0; }
+  .cover .tag { display: inline-block; margin-top: 18px; background: #eef0ff; color: var(--brand);
+    border-radius: 999px; padding: 5px 14px; font-size: 12px; font-weight: 600; }
+
+  h2 { font-size: 18px; margin: 26px 0 8px; color: var(--ink); border-bottom: 1px solid var(--line); padding-bottom: 5px; }
+  h3 { font-size: 14.5px; margin: 18px 0 4px; }
+  p { margin: 6px 0; }
+  ul { margin: 6px 0; padding-inline-start: 22px; }
+  li { margin: 3px 0; }
+  .lead { font-size: 13.5px; color: #333; }
+
+  .card { background: var(--fill); border: 1px solid var(--line); border-radius: 10px;
+    padding: 12px 16px; margin: 12px 0; page-break-inside: avoid; }
+  .card h3 { margin-top: 0; }
+  .why { color: var(--brand); font-weight: 600; }
+  .label { color: var(--muted); font-weight: 600; }
+
+  .steps { counter-reset: s; list-style: none; padding: 0; }
+  .steps li { counter-increment: s; position: relative; padding: 8px 0 8px 40px; }
+  .steps li::before { content: counter(s); position: absolute; left: 0; top: 6px;
+    width: 26px; height: 26px; background: var(--brand); color: #fff; border-radius: 50%;
+    text-align: center; line-height: 26px; font-weight: 700; font-size: 13px; }
+
+  .note { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: 12px 16px; margin: 12px 0; }
+  footer { margin-top: 30px; padding-top: 12px; border-top: 1px solid var(--line);
+    color: var(--muted); font-size: 11px; text-align: center; }
+
+  @media print {
+    .cover { padding-top: 40px; }
+    h2 { page-break-after: avoid; }
+    a { color: var(--ink); text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="cover">
+    <svg class="logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <rect width="24" height="24" rx="5" fill="#4f46e5"/>
+      <circle cx="12" cy="12" r="7.5" fill="none" stroke="#fff" stroke-width="1.6"/>
+      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="#fff"/>
+    </svg>
+    <h1>AI PM Command Center</h1>
+    <p class="sub">A Simple Guide — what this app does and how it helps you</p>
+    <span class="tag">No technical knowledge needed</span>
+  </div>
+
+  <h2>What is this app, in one sentence?</h2>
+  <p class="lead">It's a single place to <strong>plan, run, and govern your AI projects</strong> —
+  especially in sensitive fields like healthcare — so nothing important slips through the cracks.
+  Think of it as a smart project office that also knows the rules and best practices and helps you follow them.</p>
+
+  <h2>How it helps you (the big picture)</h2>
+  <ul>
+    <li>Keeps <strong>all your project work in one place</strong> — tasks, plans, risks, decisions.</li>
+    <li>Has <strong>built-in expert knowledge</strong> (a 23-chapter guide) you can search anytime.</li>
+    <li><strong>Checks your project against good practice</strong> before you start, so you fix gaps early.</li>
+    <li>Can use <strong>AI for smarter suggestions</strong> — but works perfectly fine without it.</li>
+    <li>Speaks <strong>English and Persian</strong>, and works on desktop and phone.</li>
+  </ul>
+
+  <h2>What each part does</h2>
+  <p class="label">You move between parts using the menu at the top of the screen.</p>
+
+  <div class="card">
+    <h3>🧭 Dashboard — your daily home base</h3>
+    <p>A quick "morning coffee" overview: your top 3 priorities, anything overdue, open problems,
+    high risks, decisions waiting on you, and today's checklist — plus a live feed of what the app did for you.</p>
+    <p class="why">Why it helps: you start each day knowing exactly what matters, without digging.</p>
+  </div>
+
+  <div class="card">
+    <h3>📋 Projects — the home for each piece of work</h3>
+    <p>Every project lives here. Open one to find tabs for:</p>
+    <ul>
+      <li><strong>Tasks</strong> — the to-do list for that project.</li>
+      <li><strong>Plan</strong> — milestones (big checkpoints), deliverables, recommended team, and risks.</li>
+      <li><strong>Timeline</strong> — a visual schedule showing what happens when and which steps are time-critical.</li>
+      <li><strong>Roadmap</strong> — what you're doing now, next, and later.</li>
+      <li><strong>Risks, Decisions, Blockers</strong> — what could go wrong, choices made, and anything stuck.</li>
+      <li><strong>Compliance, Documents, Activity</strong> — your standards score, files, and full history.</li>
+    </ul>
+    <p class="why">Why it helps: everything about a project is in one organized place.</p>
+  </div>
+
+  <div class="card">
+    <h3>✅ Tasks — your to-do list</h3>
+    <p>See and manage your action items. Tick them off as you go.</p>
+    <p class="why">Why it helps: clear, simple progress tracking.</p>
+  </div>
+
+  <div class="card">
+    <h3>☑️ Checklists — daily, weekly, and monthly routines</h3>
+    <p>Ready-made routines for recurring good habits. Anything you don't finish carries over to the next day automatically.</p>
+    <p class="why">Why it helps: builds discipline and consistency without extra effort.</p>
+  </div>
+
+  <div class="card">
+    <h3>📚 Knowledge — your built-in expert library</h3>
+    <p>A full 23-chapter guide on managing AI products, fully searchable. Type a question and get the
+    most relevant sections, with matching words highlighted.</p>
+    <p class="why">Why it helps: expert guidance is always a search away.</p>
+  </div>
+
+  <div class="card">
+    <h3>📖 References — add your own documents</h3>
+    <p>Upload or paste your own materials (policies, templates, past documents). The app uses them when
+    giving suggestions. You choose whether a document applies to all projects or just one.</p>
+    <p class="why">Why it helps: the app's advice becomes tailored to your organization's rules.</p>
+  </div>
+
+  <div class="card">
+    <h3>🔍 Glossary — plain-language definitions</h3>
+    <p>Quick definitions of AI and product terms.</p>
+    <p class="why">Why it helps: no more getting lost in jargon.</p>
+  </div>
+
+  <div class="card">
+    <h3>🛡️ Compliance — a readiness check before you start</h3>
+    <p>Upload a project document and the app reviews it against a governance checklist. You get a
+    <strong>score and grade</strong>, a list of what's missing, and recommendations — each pointing to the
+    exact guide chapter that explains it.</p>
+    <p class="why">Why it helps: you catch problems before the project starts, when they're cheap to fix.</p>
+  </div>
+
+  <div class="card">
+    <h3>🔥 Issues — a guided way to solve problems</h3>
+    <p>Log a problem and the app helps you handle it properly: it rates urgency, auto-creates the right
+    tasks for serious ones, and gives you a checklist you must complete before a problem can be closed.</p>
+    <p class="why">Why it helps: problems get solved thoroughly and on time — not forgotten.</p>
+  </div>
+
+  <div class="card">
+    <h3>➕ New Project Intake — the "start a project" button</h3>
+    <p>Tell the app about a new project (and optionally upload a document), and it does the heavy lifting at once:</p>
+    <ul>
+      <li>Reviews it for compliance and readiness.</li>
+      <li>Suggests relevant reading from the guide.</li>
+      <li>Turns gaps into a prioritized to-do list with due dates.</li>
+      <li>Builds a roadmap, a full dated plan with milestones, and a risk list.</li>
+      <li>Sets up your daily / weekly / monthly checklists.</li>
+      <li>Writes a starting strategy outline.</li>
+    </ul>
+    <p class="why">Why it helps: days of setup happen in moments, and every project starts on solid footing.</p>
+  </div>
+
+  <h2>Good to know</h2>
+  <ul>
+    <li><strong>Works without AI.</strong> Fully usable on its own. Turn AI on for smarter suggestions
+    (you'll see an "AI-enhanced" badge); if AI is ever unavailable, nothing breaks.</li>
+    <li><strong>Two languages.</strong> Switch between English and Persian anytime from the top bar.</li>
+    <li><strong>Light and dark mode.</strong> It matches your device automatically.</li>
+    <li><strong>Works on your phone.</strong> The menu collapses into a tidy ☰ button on small screens.</li>
+    <li><strong>Privacy reminder.</strong> On a shared online demo, don't upload real patient or confidential data.</li>
+  </ul>
+
+  <h2>Getting started in 3 steps</h2>
+  <ol class="steps">
+    <li>Open <strong>New Project Intake</strong> and describe your project (upload a document if you have one).</li>
+    <li>Review what the app generated — compliance check, plan, roadmap, tasks, and reading list.</li>
+    <li>Use the <strong>Dashboard</strong> daily to stay on top of priorities, and tick off your <strong>Checklists</strong>.</li>
+  </ol>
+  <p>That's it — you're running a well-governed AI project.</p>
+
+  <footer>AI PM Command Center · Simple Guide</footer>
+</div>
+</body>
+</html>
