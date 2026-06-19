@@ -2,6 +2,8 @@
   "app.title": "AI PM Command Center",
   "a11y.skip": "Skip to main content",
   "a11y.menu": "Menu",
+  "projects.empty": "No projects yet — run an intake to set up your first one.",
+  "kb.empty": "Knowledge base is empty — use “Import guide” above to upload your guide.",
   "nav.dashboard": "Dashboard",
   "nav.projects": "Projects",
   "nav.tasks": "Tasks",

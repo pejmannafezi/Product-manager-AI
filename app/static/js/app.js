@@ -1,3 +1,20 @@
+// Submit feedback: on a POST form submit, show a spinner on the submit button
+// and disable further clicks. The page navigates (303 redirect) so the loading
+// state naturally clears on the next render. Skips cancelled submits (e.g. a
+// "confirm" dialog that returned false) and forms opting out with data-noloading.
+document.addEventListener("submit", (e) => {
+  if (e.defaultPrevented) return;
+  const form = e.target;
+  if ((form.getAttribute("method") || "get").toLowerCase() !== "post") return;
+  if (form.dataset.noloading !== undefined) return;
+  const btn = form.querySelector("button[type=submit], button:not([type])");
+  if (btn) {
+    btn.classList.add("is-loading");
+    // defer disabling so the button's value (if any) is still submitted
+    setTimeout(() => { btn.disabled = true; }, 0);
+  }
+});
+
 // Checkbox toggles post to the API without a page reload.
 document.addEventListener("change", async (e) => {
   const el = e.target;

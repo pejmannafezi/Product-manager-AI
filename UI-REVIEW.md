@@ -105,9 +105,21 @@ mobile); full suite still 21 passed.
 
 Added translation keys `a11y.skip` and `a11y.menu` (EN + FA).
 
+## Follow-up v3: empty states + loading feedback (done)
+
+- **Richer empty states** — an `emptystate()` macro (soft icon + message + optional
+  CTA) replaces plain italic text on the first-run surfaces: Projects (with a "New
+  Project Intake" CTA), Knowledge, and the global/project Reference lists. Added
+  `projects.empty` / `kb.empty` keys (EN + FA).
+- **Submit/loading feedback** — a small global enhancement in `app.js` shows a
+  spinner on the submit button and disables it when a POST form is submitted
+  (covers the slow agent-driven flows: intake, compliance upload, AI analyze,
+  plan generation). Skips cancelled `confirm()` submits and `data-noloading`
+  forms; honors reduced-motion. Verified in-browser; suite 21 passed.
+
 ## Still recommended (next steps)
 
-- **Empty/loading states.** A few lists rely on plain italic "empty" text; richer
-  empty states with a suggested action would help first-run users.
-- **Convert remaining in-content emoji** if any surface later (the dashboard,
-  intake, and login sets are already done).
+- Convert remaining in-content emoji if any new ones surface (dashboard, intake,
+  and login sets are already done).
+- Consider skeleton placeholders if any view later loads data asynchronously
+  (the app is currently server-rendered, so this isn't needed yet).

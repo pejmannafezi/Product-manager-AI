@@ -85,6 +85,21 @@ h1 .icon, h2 .icon { color: var(--link); }
 .muted { color: var(--muted); font-size: 13px; }
 .empty { color: var(--muted); font-style: italic; padding: 8px 0; }
 
+/* richer empty state: soft icon + message + optional CTA */
+.empty-state { text-align: center; padding: 30px 16px; color: var(--muted); }
+.empty-state .icon { display: block; width: 34px; height: 34px; margin: 0 auto 10px;
+  color: var(--muted); opacity: .5; vertical-align: initial; }
+.empty-state p { margin: 0 0 14px; }
+
+/* button loading state: spinner + disabled, set via app.js on POST submit */
+button.is-loading, .btn.is-loading { pointer-events: none; opacity: .85; }
+button.is-loading::before, .btn.is-loading::before {
+  content: ""; display: inline-block; width: 14px; height: 14px; margin-inline-end: 8px;
+  vertical-align: -2px; border: 2px solid currentColor; border-top-color: transparent;
+  border-radius: 50%; animation: btnspin .6s linear infinite;
+}
+@keyframes btnspin { to { transform: rotate(360deg); } }
+
 .badge {
   display: inline-block; padding: 2px 9px; border-radius: 999px;
   font-size: 12px; font-weight: 600; border: 1px solid transparent;
