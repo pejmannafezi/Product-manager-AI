@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ t('nav.issues') }} · {{ t('app.title') }}{% endblock %}
+{% block content %}
+<h1>{{ t('nav.issues') }}</h1>
+
+<div class="grid cols-2">
+  <div class="card">
+    <table>
+      <tr><th>{{ t('label.severity') }}</th><th>{{ t('label.title') }}</th>
+          <th>{{ t('label.project') }}</th><th>{{ t('label.status') }}</th></tr>
+      {% for i in issues %}
+      <tr>
+        <td><span class="badge {{ i.severity }}">{{ i.severity }}</span></td>
+        <td><a href="/issues/{{ i.id }}">{{ i.title }}</a></td>
+        <td>{{ i.project_name or '—' }}</td>
+        <td>{{ i.status }}</td>
+      </tr>
+      {% else %}<tr><td colspan="4" class="empty">{{ t('dash.none') }}</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>{{ t('btn.add') }}</h2>
+    <p class="muted">Severity is auto-classified (P0–P3) if you leave it on "auto". P0/P1 issues automatically create a blocker and a same/next-day containment task.</p>
+    <form class="stack" action="/api/issues" method="post">
+      <label>{{ t('label.title') }}<input type="text" name="title" required></label>
+      <label>{{ t('label.description') }}<textarea name="description"
+        placeholder="What was expected? What actually happened? Who is affected? When did it begin?"></textarea></label>
+      <label>{{ t('label.severity') }}
+        <select name="severity">
+          <option value="">auto</option>
+          <option>P0</option><option>P1</option><option>P2</option><option>P3</option>
+        </select></label>
+      <label>{{ t('label.affected_area') }}<input type="text" name="affected_area" placeholder="production / pilot / data pipeline …"></label>
+      <label>{{ t('label.reported_by') }}<input type="text" name="reported_by"></label>
+      <label>{{ t('label.project') }}
+        <select name="project_id"><option value="">—</option>
+          {% for p in projects %}<option value="{{ p.id }}">{{ p.name }}</option>{% endfor %}
+        </select></label>
+      <button type="submit">{{ t('btn.submit') }}</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

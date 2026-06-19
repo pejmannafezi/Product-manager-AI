@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}{{ t('nav.dashboard') }} · {{ t('app.title') }}{% endblock %}
+{% block content %}
+<h1>{{ t('nav.dashboard') }}
+  {% if ai_on %}<span class="badge ai">{{ t('ai.enhanced') }}</span>
+  {% else %}<span class="badge gray">{{ t('ai.rule_based') }}</span>{% endif %}
+</h1>
+
+<div class="tabs">
+  <a href="/?period=daily" class="{{ 'active' if period == 'daily' }}">{{ t('dash.daily') }}</a>
+  <a href="/?period=weekly" class="{{ 'active' if period == 'weekly' }}">{{ t('dash.weekly') }}</a>
+  <a href="/?period=monthly" class="{{ 'active' if period == 'monthly' }}">{{ t('dash.monthly') }}</a>
+</div>
+
+<div class="grid cols-2">
+  <div class="card">
+    <h2>{{ icon('star') }}{{ t('dash.top3') }}</h2>
+    {% if focus.top3 %}
+    <ul class="clean">
+      {% for task in focus.top3 %}
+      <li class="check-item {{ 'done' if task.status == 'done' }}">
+        <input type="checkbox" data-toggle-url="/api/tasks/{{ task.id }}/toggle" {{ 'checked' if task.status == 'done' }}>
+        <span>
+          <span class="badge {{ task.priority }}">{{ task.priority }}</span>
+          {{ task.title }}
+          <span class="muted">{{ task.project_name or '' }} {{ task.due_date or '' }}</span>
+        </span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}<p class="empty">{{ t('dash.none') }}</p>{% endif %}
+  </div>
+
+  <div class="card">
+    <h2>{{ icon('clock') }}{{ t('dash.overdue') }} ({{ focus.overdue | length }})</h2>
+    {% if focus.overdue %}
+    <ul class="clean">
+      {% for task in focus.overdue %}
+      <li><span class="badge high">{{ task.due_date }}</span> {{ task.title }}
+          <span class="muted">{{ task.project_name or '' }}</span></li>
+      {% endfor %}
+    </ul>
+    {% else %}<p class="empty">{{ t('dash.none') }}</p>{% endif %}
+  </div>
+
+  <div class="card">
+    <h2>{{ icon('ban') }}{{ t('dash.blockers') }} ({{ focus.blockers | length }})</h2>
+    {% if focus.blockers %}
+    <ul class="clean">
+      {% for b in focus.blockers %}
+      <li><span class="badge {{ b.severity }}">{{ b.severity }}</span> {{ b.title }}
+          <span class="muted">{{ b.project_name or '' }}</span></li>
+      {% endfor %}
+    </ul>
+    {% else %}<p class="empty">{{ t('dash.none') }}</p>{% endif %}
+  </div>
+
+  <div class="card">
+    <h2>{{ icon('alert-triangle') }}{{ t('dash.risks') }} (score ≥ 15)</h2>
+    {% if focus.risks %}
+    <ul class="clean">
+      {% for r in focus.risks %}
+      <li><span class="badge high">{{ r.score }}</span> {{ r.title }}
+          <span class="muted">{{ r.category }} · {{ r.project_name or '' }}</span></li>
+      {% endfor %}
+    </ul>
+    {% else %}<p class="empty">{{ t('dash.none') }}</p>{% endif %}
+  </div>
+
+  <div class="card">
+    <h2>{{ icon('git-branch') }}{{ t('dash.decisions') }} ({{ focus.decisions | length }})</h2>
+    {% if focus.decisions %}
+    <ul class="clean">
+      {% for d in focus.decisions %}
+      <li>{{ d.title }} <span class="muted">{{ d.project_name or '' }}</span></li>
+      {% endfor %}
+    </ul>
+    {% else %}<p class="empty">{{ t('dash.none') }}</p>{% endif %}
+  </div>
+
+  <div class="card">
+    <h2>{{ icon('flame') }}{{ t('dash.issues') }} ({{ focus.issues | length }})</h2>
+    {% if focus.issues %}
+    <ul class="clean">
+      {% for i in focus.issues %}
+      <li><a href="/issues/{{ i.id }}"><span class="badge {{ i.severity }}">{{ i.severity }}</span>
+          {{ i.title }}</a> <span class="muted">{{ i.status }}</span></li>
+      {% endfor %}
+    </ul>
+    {% else %}<p class="empty">{{ t('dash.none') }}</p>{% endif %}
+  </div>
+</div>
+
+<div class="grid cols-2" style="margin-top:16px">
+  <div class="card">
+    <h2>{{ icon('check-circle') }}{{ t('dash.' + period) }} — {{ checklist.key }}
+      <span class="muted">{{ checklist.done }}/{{ checklist.total }}</span></h2>
+    <div class="progressbar"><div style="width: {{ (100 * checklist.done / checklist.total) | round if checklist.total else 0 }}%"></div></div>
+    {% for section, items in checklist.sections.items() %}
+    <details {{ 'open' if loop.first }}>
+      <summary>{{ section }}</summary>
+      {% for item in items %}
+      <div class="check-item {{ 'done' if item.done }}">
+        <input type="checkbox" data-toggle-url="/api/checklist-items/{{ item.id }}/toggle" {{ 'checked' if item.done }}>
+        <span>{{ item.text }}</span>
+      </div>
+      {% endfor %}
+    </details>
+    {% endfor %}
+    <p><a href="/checklists?period={{ period }}">{{ t('nav.checklists') }} →</a></p>
+  </div>
+
+  <div class="card">
+    <h2>{{ icon('bot') }}{{ t('dash.activity') }}</h2>
+    <ul class="clean feed">
+      {% for e in events %}
+      <li><span class="agent-name agent-{{ e.agent }}">{{ e.agent }}</span>
+          {{ e.summary }} <span class="muted">{{ e.created_at }}</span></li>
+      {% else %}
+      <li class="empty">{{ t('dash.none') }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

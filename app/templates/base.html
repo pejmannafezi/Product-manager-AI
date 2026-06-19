@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}" dir="{{ dir }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ t('app.title') }}{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+  <meta name="theme-color" content="#111527">
+  <link rel="stylesheet" href="/static/css/app.css">
+  {% if lang == 'fa' %}<link rel="stylesheet" href="/static/css/rtl.css">{% endif %}
+</head>
+<body>
+{% set path = request.url.path %}
+{% macro navlink(href, key, cls='') -%}
+  {%- set active = (path == '/') if href == '/' else path.startswith(href) -%}
+  <a href="{{ href }}" class="{{ cls }}{{ ' active' if active }}"{% if active %} aria-current="page"{% endif %}>{{ t(key) }}</a>
+{%- endmacro %}
+<a class="skip-link" href="#main">{{ t('a11y.skip') }}</a>
+<header class="topbar">
+  <a class="brand" href="/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10"></circle>
+      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+    </svg>
+    <span>{{ t('app.title') }}</span>
+  </a>
+  <input type="checkbox" id="nav-toggle" class="nav-toggle" hidden>
+  <label for="nav-toggle" class="nav-burger" aria-label="{{ t('a11y.menu') }}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </label>
+  <nav>
+    {{ navlink('/', 'nav.dashboard') }}
+    {{ navlink('/projects', 'nav.projects') }}
+    {{ navlink('/tasks', 'nav.tasks') }}
+    {{ navlink('/checklists', 'nav.checklists') }}
+    {{ navlink('/knowledge', 'nav.knowledge') }}
+    {{ navlink('/references', 'nav.references') }}
+    {{ navlink('/glossary', 'nav.glossary') }}
+    {{ navlink('/compliance', 'nav.compliance') }}
+    {{ navlink('/issues', 'nav.issues') }}
+    {{ navlink('/intake', 'nav.intake', 'cta') }}
+  </nav>
+  <div class="topbar-end">
+    <form action="/search" method="get" class="inline-search">
+      <input type="search" name="q" placeholder="{{ t('search.placeholder') }}">
+    </form>
+    <form action="/lang/{{ 'fa' if lang == 'en' else 'en' }}" method="post">
+      <button class="lang-btn" type="submit">{{ t('lang.toggle') }}</button>
+    </form>
+  </div>
+</header>
+<main id="main">
+{% block content %}{% endblock %}
+</main>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

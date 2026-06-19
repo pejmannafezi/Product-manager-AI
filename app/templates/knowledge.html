@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% from "_icons.html" import emptystate %}
+{% block title %}{{ t('nav.knowledge') }} · {{ t('app.title') }}{% endblock %}
+{% block content %}
+<h1>{{ t('nav.knowledge') }}</h1>
+
+<form action="/search" method="get" style="margin-bottom:18px">
+  <input type="search" name="q" placeholder="{{ t('search.placeholder') }}" style="max-width:480px">
+</form>
+
+<details class="card" style="margin-bottom:18px">
+  <summary>{{ t('kb.import') }}</summary>
+  <p class="muted">{{ t('kb.import_hint') }}</p>
+  <form action="/api/knowledge/import" method="post" enctype="multipart/form-data" class="stack">
+    <input type="file" name="file" accept=".docx" required>
+    <button type="submit">{{ t('kb.import_btn') }}</button>
+  </form>
+</details>
+
+<div class="grid cols-3">
+  {% for c in chapters %}
+  <a class="card chapter-card" href="/knowledge/chapter/{{ c.number }}">
+    <div class="chapter-num">CHAPTER {{ c.number }}</div>
+    <strong>{{ c.title }}</strong>
+    <p class="muted">{{ (c.summary or '')[:160] }}{% if c.summary and c.summary|length > 160 %}…{% endif %}</p>
+    <span class="muted">{{ c.word_count }} words</span>
+  </a>
+  {% else %}
+  <div class="card">{{ emptystate(t('kb.empty'), 'book') }}</div>
+  {% endfor %}
+</div>
+{% endblock %}

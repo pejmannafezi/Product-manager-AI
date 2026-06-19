@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<p><a href="/compliance">← {{ t('nav.compliance') }}</a></p>
+<h1>{{ report.filename or 'Compliance Report' }}
+  {% if report.ai_enhanced %}<span class="badge ai">{{ t('ai.enhanced') }}</span>{% endif %}</h1>
+
+<div class="grid cols-2">
+  <div class="card">
+    <div class="score-ring">{{ report.score }}<small>/100</small>
+      <span class="badge {{ report.grade | replace(' ', '') }}">{{ report.grade }}</span></div>
+    <p class="muted">{{ report.project_name or '' }} · {{ report.created_at }}</p>
+    <div class="md">{{ report.summary }}</div>
+  </div>
+  <div class="card">
+    <h2>{{ t('btn.create_tasks') }}</h2>
+    <p class="muted">Missing and partial artifacts become prioritized tasks with due dates and guide references.</p>
+    <form action="/api/compliance/report/{{ report.id }}/create-tasks" method="post">
+      <button type="submit">{{ t('btn.create_tasks') }}</button>
+    </form>
+  </div>
+</div>
+
+<div class="card" style="margin-top:16px">
+  <table>
+    <tr><th>{{ t('compliance.artifact') }}</th><th>Category</th><th>{{ t('label.status') }}</th>
+        <th>{{ t('compliance.evidence') }} / {{ t('compliance.recommendation') }}</th>
+        <th>{{ t('compliance.references') }}</th></tr>
+    {% for row in findings %}
+    <tr>
+      <td><strong>{{ row.f.rule_name }}</strong></td>
+      <td><span class="badge {{ row.f.category }}">{{ row.f.category }}</span></td>
+      <td><span class="badge {{ row.f.status }}">{{ row.f.status }}</span>
+          {% if row.f.task_id %}<br><span class="muted">task #{{ row.f.task_id }}</span>{% endif %}</td>
+      <td class="kb-content" dir="ltr">
+        {% if row.f.evidence_snippet %}<span class="muted">{{ row.f.evidence_snippet }}</span><br>{% endif %}
+        {% if row.f.status != 'present' %}{{ row.f.recommendation }}{% endif %}
+      </td>
+      <td>
+        {% for c in row.chapters %}
+        <a href="/knowledge/chapter/{{ c.number }}">Ch. {{ c.number }}</a>{% if not loop.last %}, {% endif %}
+        {% endfor %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

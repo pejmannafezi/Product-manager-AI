@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ t('nav.glossary') }} · {{ t('app.title') }}{% endblock %}
+{% block content %}
+<h1>{{ t('nav.glossary') }}</h1>
+<form action="/glossary" method="get" style="margin-bottom:14px">
+  <input type="search" name="q" value="{{ q }}" placeholder="…" style="max-width:360px">
+</form>
+<div class="card kb-content" dir="ltr" lang="en">
+  <table>
+    {% for term in terms %}
+    <tr><td style="width:220px"><strong>{{ term.term }}</strong></td><td>{{ term.definition }}</td></tr>
+    {% else %}
+    <tr><td class="empty">{{ t('dash.none') }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}{{ project.name }} · {{ t('app.title') }}{% endblock %}
+{% block content %}
+<h1>{{ t('intake.result') }}: {{ project.name }}</h1>
+{% if doc_error %}<div class="flash-error">{{ doc_error }} — the review ran without the document.</div>{% endif %}
+
+<div class="grid cols-2">
+  <div class="card">
+    <h2>{{ t('nav.compliance') }}</h2>
+    {% if report %}
+    <div class="score-ring">{{ report.score }}<small>/100</small>
+      <span class="badge {{ report.grade | replace(' ', '') }}">{{ report.grade }}</span></div>
+    <div class="md">{{ report.summary }}</div>
+    <p><a class="btn secondary" href="/compliance/report/{{ report.id }}">Full report →</a></p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2>{{ icon('book') }}{{ t('intake.reading') }}</h2>
+    <ul class="clean kb-content" dir="ltr">
+      {% for c in reading %}
+      <li><a href="/knowledge/chapter/{{ c.number }}">Chapter {{ c.number }}: {{ c.title }}</a></li>
+      {% else %}<li class="empty">{{ t('dash.none') }}</li>
+      {% endfor %}
+    </ul>
+
+    <h2>{{ icon('bot') }}{{ t('dash.activity') }}</h2>
+    <ul class="clean feed">
+      {% for e in events %}
+      <li><span class="agent-name agent-{{ e.agent }}">{{ e.agent }}</span> {{ e.summary }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<div class="grid cols-2" style="margin-top:16px">
+  <div class="card">
+    <h2>{{ icon('check-circle') }}{{ tasks | length }} {{ t('intake.tasks_created') }}</h2>
+    <ul class="clean">
+      {% for task in tasks %}
+      <li><span class="badge {{ task.priority }}">{{ task.priority }}</span> {{ task.title }}
+          <span class="muted">{{ task.due_date or '' }}</span></li>
+      {% endfor %}
+    </ul>
+    <p><a href="/projects/{{ project.id }}">{{ t('label.project') }} →</a></p>
+  </div>
+
+  <div class="card">
+    <h2>{{ icon('map') }}{{ t('project.tabs.roadmap') }}</h2>
+    {% for horizon in ['now','next','later'] %}
+    <h2 style="font-size:15px">{{ t('roadmap.' + horizon) }}</h2>
+    <ul class="clean">
+      {% for item in roadmap[horizon] %}
+      <li><strong>{{ item.title }}</strong><br><span class="muted">{{ item.description }}</span></li>
+      {% endfor %}
+    </ul>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="card" style="margin-top:16px">
+  <h2>{{ icon('compass') }}{{ t('intake.strategy') }}</h2>
+  <div class="md kb-content" dir="ltr">{{ strategy }}</div>
+</div>
+{% endblock %}

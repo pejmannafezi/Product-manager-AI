@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% from "_icons.html" import emptystate %}
+{% block title %}{{ t('nav.references') }} · {{ t('app.title') }}{% endblock %}
+{% block content %}
+<h1>{{ t('nav.references') }}</h1>
+<p class="muted">{{ t('refs.intro') }}</p>
+
+{% if not ai_on %}
+<div class="card" style="margin-bottom:14px"><p class="muted">{{ t('refs.ai_off') }}</p></div>
+{% endif %}
+
+{% if error %}<div class="flash-error">{{ error }}</div>{% endif %}
+
+<div class="card" style="margin:18px 0">
+  <h3>{{ t('refs.add') }}</h3>
+  <form action="/api/references" method="post" enctype="multipart/form-data" class="stack">
+    <div>
+      <label><input type="radio" name="scope" value="global" checked onchange="refScope(this.value)">
+        {{ t('refs.global') }}</label>
+      <label style="margin-inline-start:18px"><input type="radio" name="scope" value="project" onchange="refScope(this.value)">
+        {{ t('refs.project') }}</label>
+      <p class="muted">{{ t('refs.global_hint') }} · {{ t('refs.project_hint') }}</p>
+    </div>
+    <select name="project_id" id="ref-project" disabled>
+      <option value="">{{ t('refs.choose_project') }}</option>
+      {% for p in projects %}<option value="{{ p.id }}">{{ p.name }}</option>{% endfor %}
+    </select>
+    <input type="text" name="title" placeholder="{{ t('refs.title_ph') }}">
+    <textarea name="text" rows="4" placeholder="{{ t('refs.paste_ph') }}"></textarea>
+    <div class="muted">{{ t('refs.or_upload') }}</div>
+    <input type="file" name="file" accept=".docx,.pdf,.txt,.md">
+    <button type="submit">{{ t('btn.add') }}</button>
+  </form>
+</div>
+
+<h3>{{ t('refs.global') }} <span class="badge">{{ globals|length }}</span></h3>
+<div class="grid cols-2">
+  {% for r in globals %}
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
+      <strong>{{ r.title }}</strong>
+      {% if not r.enabled %}<span class="badge gray">{{ t('refs.disabled') }}</span>{% endif %}
+    </div>
+    <p class="muted">{{ r.filename or t('refs.pasted') }} · {{ r.char_count }} {{ t('refs.chars') }}</p>
+    <div style="display:flex;gap:8px">
+      <form action="/api/references/{{ r.id }}/toggle" method="post">
+        <button class="btn secondary" type="submit">{{ t('refs.enable') if not r.enabled else t('refs.disable') }}</button>
+      </form>
+      <form action="/api/references/{{ r.id }}/delete" method="post"
+            onsubmit="return confirm('{{ t('refs.confirm_delete') }}')">
+        <button class="btn danger" type="submit">{{ t('refs.delete') }}</button>
+      </form>
+    </div>
+  </div>
+  {% else %}
+  <div class="card">{{ emptystate(t('refs.empty_global'), 'book') }}</div>
+  {% endfor %}
+</div>
+
+<h3 style="margin-top:24px">{{ t('refs.project') }} <span class="badge">{{ project_refs|length }}</span></h3>
+<div class="grid cols-2">
+  {% for r in project_refs %}
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
+      <strong>{{ r.title }}</strong>
+      {% if not r.enabled %}<span class="badge gray">{{ t('refs.disabled') }}</span>{% endif %}
+    </div>
+    <div class="muted">{{ r.project_name }}</div>
+    <p class="muted">{{ r.filename or t('refs.pasted') }} · {{ r.char_count }} {{ t('refs.chars') }}</p>
+    <div style="display:flex;gap:8px">
+      <form action="/api/references/{{ r.id }}/toggle" method="post">
+        <button class="btn secondary" type="submit">{{ t('refs.enable') if not r.enabled else t('refs.disable') }}</button>
+      </form>
+      <form action="/api/references/{{ r.id }}/delete" method="post"
+            onsubmit="return confirm('{{ t('refs.confirm_delete') }}')">
+        <button class="btn danger" type="submit">{{ t('refs.delete') }}</button>
+      </form>
+    </div>
+  </div>
+  {% else %}
+  <div class="card">{{ emptystate(t('refs.empty_project'), 'book') }}</div>
+  {% endfor %}
+</div>
+
+<script>
+function refScope(v){ document.getElementById('ref-project').disabled = (v !== 'project'); }
+</script>
+{% endblock %}
