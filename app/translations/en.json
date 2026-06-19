@@ -1,6 +1,7 @@
 {
   "app.title": "AI PM Command Center",
   "a11y.skip": "Skip to main content",
+  "a11y.menu": "Menu",
   "nav.dashboard": "Dashboard",
   "nav.projects": "Projects",
   "nav.tasks": "Tasks",

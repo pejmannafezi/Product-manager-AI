@@ -84,17 +84,30 @@ set inheriting `currentColor`, and replaced every emoji with `{{ icon('…') }}`
 Header icons are tinted with the brand color via `h1 .icon, h2 .icon`. Verified
 in-browser; no emoji remain in any template; full suite still 21 passed.
 
-## Deliberately left out (recommended next steps)
+## Follow-up v2: dark mode, active nav, mobile nav (done)
 
-These are worthwhile but bigger than a styling pass and need visual testing:
+All verified in-browser with headless-Chrome screenshots (light + dark, desktop +
+mobile); full suite still 21 passed.
 
-1. **Full dark mode.** The variable system makes it feasible, but the topbar,
-   badges, and several light fills need paired light/dark tokens and per-page
-   contrast checks — best done as its own change with screenshots.
-2. **Active-nav highlighting.** The nav doesn't mark the current page; passing an
-   `active` flag from the routers + an `aria-current="page"` style would aid
-   orientation (`nav-state-active`).
-3. **Empty/loading states.** A few lists rely on plain italic "empty" text;
-   richer empty states with a suggested action would help first-run users.
-4. **Mobile nav.** At very narrow widths the 10-item nav wraps to several rows; a
-   collapsible menu under ~640px would tidy this up.
+1. **Dark mode** — added a `@media (prefers-color-scheme: dark)` block driven by
+   the existing token system. Tokenized the last hardcoded fills (`--input-bg`)
+   and split link/accent text into a `--link` token so card-surface text and
+   icons lighten correctly on dark; `mark` and agent-feed colors get dark-mode
+   overrides; shadows/focus-ring re-tuned. The always-dark topbar now reads as
+   intentional in both themes.
+2. **Active-nav highlighting** — a `navlink()` macro in `base.html` marks the
+   current page with `.active` + `aria-current="page"` (no router changes; uses
+   `request.url.path`).
+3. **Mobile nav** — a CSS-only disclosure (hidden checkbox + ☰ label) collapses
+   the 10-item nav under 760px into a toggle that stacks nav, search, and the
+   language switch full-width. Also fixed a latent horizontal-overflow bug by
+   clamping the grid columns with `minmax(min(340px, 100%), 1fr)`.
+
+Added translation keys `a11y.skip` and `a11y.menu` (EN + FA).
+
+## Still recommended (next steps)
+
+- **Empty/loading states.** A few lists rely on plain italic "empty" text; richer
+  empty states with a suggested action would help first-run users.
+- **Convert remaining in-content emoji** if any surface later (the dashboard,
+  intake, and login sets are already done).

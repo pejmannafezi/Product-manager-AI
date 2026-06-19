@@ -8,6 +8,11 @@
   {% if lang == 'fa' %}<link rel="stylesheet" href="/static/css/rtl.css">{% endif %}
 </head>
 <body>
+{% set path = request.url.path %}
+{% macro navlink(href, key, cls='') -%}
+  {%- set active = (path == '/') if href == '/' else path.startswith(href) -%}
+  <a href="{{ href }}" class="{{ cls }}{{ ' active' if active }}"{% if active %} aria-current="page"{% endif %}>{{ t(key) }}</a>
+{%- endmacro %}
 <a class="skip-link" href="#main">{{ t('a11y.skip') }}</a>
 <header class="topbar">
   <a class="brand" href="/">
@@ -18,17 +23,26 @@
     </svg>
     <span>{{ t('app.title') }}</span>
   </a>
+  <input type="checkbox" id="nav-toggle" class="nav-toggle" hidden>
+  <label for="nav-toggle" class="nav-burger" aria-label="{{ t('a11y.menu') }}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </label>
   <nav>
-    <a href="/">{{ t('nav.dashboard') }}</a>
-    <a href="/projects">{{ t('nav.projects') }}</a>
-    <a href="/tasks">{{ t('nav.tasks') }}</a>
-    <a href="/checklists">{{ t('nav.checklists') }}</a>
-    <a href="/knowledge">{{ t('nav.knowledge') }}</a>
-    <a href="/references">{{ t('nav.references') }}</a>
-    <a href="/glossary">{{ t('nav.glossary') }}</a>
-    <a href="/compliance">{{ t('nav.compliance') }}</a>
-    <a href="/issues">{{ t('nav.issues') }}</a>
-    <a class="cta" href="/intake">{{ t('nav.intake') }}</a>
+    {{ navlink('/', 'nav.dashboard') }}
+    {{ navlink('/projects', 'nav.projects') }}
+    {{ navlink('/tasks', 'nav.tasks') }}
+    {{ navlink('/checklists', 'nav.checklists') }}
+    {{ navlink('/knowledge', 'nav.knowledge') }}
+    {{ navlink('/references', 'nav.references') }}
+    {{ navlink('/glossary', 'nav.glossary') }}
+    {{ navlink('/compliance', 'nav.compliance') }}
+    {{ navlink('/issues', 'nav.issues') }}
+    {{ navlink('/intake', 'nav.intake', 'cta') }}
   </nav>
   <div class="topbar-end">
     <form action="/search" method="get" class="inline-search">
