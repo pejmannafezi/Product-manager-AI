@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ project.name }}
+  <span class="badge {{ 'present' if project.status == 'active' else 'gray' }}">{{ project.status }}</span>
+  <span class="badge low">{{ project.phase or '' }}</span></h1>
+<p class="muted">{{ project.description or '' }}</p>
+
+<div class="tabs">
+  {% for tb in ['tasks','roadmap','risks','decisions','blockers','compliance','documents','activity'] %}
+  <a href="/projects/{{ project.id }}?tab={{ tb }}" class="{{ 'active' if tab == tb }}">{{ t('project.tabs.' + tb) }}</a>
+  {% endfor %}
+</div>
+
+{% if tab == 'tasks' %}
+<div class="grid cols-2">
+  <div class="card">
+    <ul class="clean">
+      {% for task in tasks %}
+      <li class="check-item {{ 'done' if task.status == 'done' }}">
+        <input type="checkbox" data-toggle-url="/api/tasks/{{ task.id }}/toggle" {{ 'checked' if task.status == 'done' }}>
+        <span><span class="badge {{ task.priority }}">{{ task.priority }}</span>
+          {{ task.title }}
+          <span class="muted">{{ task.due_date or '' }} · {{ task.source }}</span>
+          {% if task.description %}<details><summary class="muted">…</summary><div class="md">{{ task.description }}</div></details>{% endif %}
+        </span>
+      </li>
+      {% else %}<li class="empty">{{ t('dash.none') }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="card">
+    <h2>{{ t('btn.add') }}</h2>
+    <form class="stack" action="/api/tasks" method="post">
+      <input type="hidden" name="project_id" value="{{ project.id }}">
+      <label>{{ t('label.title') }}<input type="text" name="title" required></label>
+      <label>{{ t('label.description') }}<textarea name="description"></textarea></label>
+      <label>{{ t('label.priority') }}
+        <select name="priority"><option>high</option><option selected>medium</option><option>low</option></select></label>
+      <label>{{ t('label.due') }}<input type="date" name="due_date"></label>
+      <button type="submit">{{ t('btn.save') }}</button>
+    </form>
+  </div>
+</div>
+
+{% elif tab == 'roadmap' %}
+<div class="grid cols-3">
+  {% for horizon in ['now','next','later'] %}
+  <div class="card">
+    <h2>{{ t('roadmap.' + horizon) }}</h2>
+    <ul class="clean">
+      {% for item in roadmap[horizon] %}
+      <li><strong>{{ item.title }}</strong><br><span class="muted">{{ item.description }}</span></li>
+      {% else %}<li class="empty">—</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endfor %}
+</div>
+
+{% elif tab == 'risks' %}
+<div class="grid cols-2">
+  <div class="card">
+    <table>
+      <tr><th>{{ t('label.title') }}</th><th>Cat.</th><th>L×I</th><th>Score</th><th>{{ t('label.status') }}</th></tr>
+      {% for r in risks %}
+      <tr><td>{{ r.title }}<br><span class="muted">{{ r.mitigation or '' }}</span></td>
+          <td>{{ r.category }}</td><td>{{ r.likelihood }}×{{ r.impact }}</td>
+          <td><span class="badge {{ 'high' if r.score >= 15 else ('medium' if r.score >= 8 else 'low') }}">{{ r.score }}</span></td>
+          <td>{{ r.status }}</td></tr>
+      {% else %}<tr><td colspan="5" class="empty">{{ t('dash.none') }}</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+  <div class="card">
+    <h2>{{ t('btn.add') }}</h2>
+    <form class="stack" action="/api/risks" method="post">
+      <input type="hidden" name="project_id" value="{{ project.id }}">
+      <label>{{ t('label.title') }}<input type="text" name="title" required></label>
+      <label>Category
+        <select name="category">{% for c in ['clinical','data','model','regulatory','privacy','security','operational','vendor','other'] %}<option>{{ c }}</option>{% endfor %}</select></label>
+      <label>Likelihood (1–5)<input type="text" name="likelihood" value="3"></label>
+      <label>Impact (1–5)<input type="text" name="impact" value="3"></label>
+      <label>Mitigation<textarea name="mitigation"></textarea></label>
+      <label>{{ t('label.owner') }}<input type="text" name="owner"></label>
+      <button type="submit">{{ t('btn.save') }}</button>
+    </form>
+  </div>
+</div>
+
+{% elif tab == 'decisions' %}
+<div class="grid cols-2">
+  <div class="card">
+    <ul class="clean">
+      {% for d in decisions %}
+      <li>
+        <strong>{{ d.title }}</strong>
+        <span class="badge {{ 'present' if d.status == 'decided' else 'medium' }}">{{ d.status }}</span><br>
+        {% if d.context %}<span class="muted">{{ d.context }}</span><br>{% endif %}
+        {% if d.status == 'decided' %}
+          <span>→ {{ d.decision }}</span> <span class="muted">{{ d.rationale or '' }} ({{ d.decided_at }})</span>
+        {% else %}
+        <form action="/api/decisions/{{ d.id }}/decide" method="post" class="stack" style="margin-top:6px">
+          <input type="text" name="decision" placeholder="Decision" required>
+          <input type="text" name="rationale" placeholder="Rationale / evidence">
+          <button type="submit" class="secondary">{{ t('btn.save') }}</button>
+        </form>
+        {% endif %}
+      </li>
+      {% else %}<li class="empty">{{ t('dash.none') }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="card">
+    <h2>{{ t('btn.add') }}</h2>
+    <form class="stack" action="/api/decisions" method="post">
+      <input type="hidden" name="project_id" value="{{ project.id }}">
+      <label>{{ t('label.title') }}<input type="text" name="title" required></label>
+      <label>Context<textarea name="context"></textarea></label>
+      <label>Options considered<textarea name="options_considered"></textarea></label>
+      <button type="submit">{{ t('btn.save') }}</button>
+    </form>
+  </div>
+</div>
+
+{% elif tab == 'blockers' %}
+<div class="grid cols-2">
+  <div class="card">
+    <ul class="clean">
+      {% for b in blockers %}
+      <li><span class="badge {{ b.severity }}">{{ b.severity }}</span>
+        <strong>{{ b.title }}</strong>
+        <span class="badge {{ 'present' if b.status == 'resolved' else 'high' }}">{{ b.status }}</span><br>
+        <span class="muted">{{ b.description or '' }}</span>
+        {% if b.status == 'open' %}
+        <form action="/api/blockers/{{ b.id }}/resolve" method="post" style="margin-top:6px">
+          <input type="text" name="resolution" placeholder="Resolution">
+          <button class="secondary" type="submit">Resolve</button>
+        </form>
+        {% else %}<br><span class="muted">→ {{ b.resolution }}</span>{% endif %}
+      </li>
+      {% else %}<li class="empty">{{ t('dash.none') }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="card">
+    <h2>{{ t('btn.add') }}</h2>
+    <form class="stack" action="/api/blockers" method="post">
+      <input type="hidden" name="project_id" value="{{ project.id }}">
+      <label>{{ t('label.title') }}<input type="text" name="title" required></label>
+      <label>{{ t('label.description') }}<textarea name="description"></textarea></label>
+      <label>{{ t('label.severity') }}
+        <select name="severity"><option>high</option><option selected>medium</option><option>low</option></select></label>
+      <button type="submit">{{ t('btn.save') }}</button>
+    </form>
+  </div>
+</div>
+
+{% elif tab == 'compliance' %}
+<div class="card">
+  <table>
+    <tr><th>Date</th><th>Document</th><th>{{ t('compliance.score') }}</th><th>{{ t('compliance.grade') }}</th></tr>
+    {% for r in reports %}
+    <tr><td>{{ r.created_at }}</td>
+        <td><a href="/compliance/report/{{ r.id }}">{{ r.filename or '—' }}</a></td>
+        <td>{{ r.score }}/100</td>
+        <td><span class="badge {{ r.grade | replace(' ', '') }}">{{ r.grade }}</span></td></tr>
+    {% else %}<tr><td colspan="4" class="empty">{{ t('dash.none') }}
+        <a href="/compliance">{{ t('nav.compliance') }} →</a></td></tr>
+    {% endfor %}
+  </table>
+</div>
+
+{% elif tab == 'documents' %}
+<div class="card">
+  <table>
+    <tr><th>File</th><th>Size</th><th>Date</th></tr>
+    {% for d in documents %}
+    <tr><td><a href="/documents/{{ d.id }}">{{ d.filename }}</a></td>
+        <td>{{ d.size }} chars</td><td>{{ d.uploaded_at }}</td></tr>
+    {% else %}<tr><td colspan="3" class="empty">{{ t('dash.none') }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+
+{% elif tab == 'activity' %}
+<div class="card">
+  <ul class="clean feed">
+    {% for e in events %}
+    <li><span class="agent-name agent-{{ e.agent }}">{{ e.agent }}</span>
+        {{ e.summary }} <span class="muted">{{ e.created_at }}</span></li>
+    {% else %}<li class="empty">{{ t('dash.none') }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+{% endblock %}

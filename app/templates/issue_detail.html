@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<p><a href="/issues">← {{ t('nav.issues') }}</a></p>
+<h1><span class="badge {{ issue.severity }}">{{ issue.severity }}</span> {{ issue.title }}
+  <span class="badge {{ 'present' if issue.status in ['resolved','closed'] else 'medium' }}">{{ issue.status }}</span></h1>
+<p class="muted">{{ issue.project_name or '' }} · {{ issue.affected_area or '' }} ·
+   {{ issue.reported_by or '' }} · {{ issue.detected_at }}</p>
+{% if request.query_params.get('blocked') %}
+<div class="flash-error">{{ t('issues.closure_hint') }}</div>
+{% endif %}
+
+<div class="grid cols-2">
+  <div class="card">
+    <h2>{{ t('label.description') }}</h2>
+    <div class="md">{{ issue.description or '—' }}</div>
+
+    <h2>{{ t('label.status') }}</h2>
+    <form class="stack" action="/api/issues/{{ issue.id }}/status" method="post">
+      <label>{{ t('label.status') }}
+        <select name="status">
+          {% for s in ['open','investigating','mitigated','resolved','closed'] %}
+          <option value="{{ s }}" {{ 'selected' if issue.status == s }}>{{ s }}</option>
+          {% endfor %}
+        </select></label>
+      <label>Root-cause category
+        <select name="root_cause_category">
+          <option value="">—</option>
+          {% for c in ['data','model','integration','workflow','people','external'] %}
+          <option value="{{ c }}" {{ 'selected' if issue.root_cause_category == c }}>{{ c }}</option>
+          {% endfor %}
+        </select></label>
+      <label>Root-cause detail<textarea name="root_cause_detail">{{ issue.root_cause_detail or '' }}</textarea></label>
+      <label>Mitigation<textarea name="mitigation">{{ issue.mitigation or '' }}</textarea></label>
+      <label>Resolution<textarea name="resolution">{{ issue.resolution or '' }}</textarea></label>
+      <button type="submit">{{ t('btn.save') }}</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>{{ t('issues.closure') }}</h2>
+    <p class="muted">{{ t('issues.closure_hint') }}</p>
+    {% for c in criteria %}
+    <div class="check-item {{ 'done' if c.done }}">
+      <input type="checkbox" data-toggle-url="/api/issues/{{ issue.id }}/criteria/{{ loop.index0 }}/toggle"
+             data-reload {{ 'checked' if c.done }}>
+      <span>{{ c.text }}</span>
+    </div>
+    {% endfor %}
+
+    {% if ai_on %}
+    <h2>{{ t('issues.recommendation') }}</h2>
+    <form action="/api/issues/{{ issue.id }}/analyze" method="post">
+      <button type="submit" class="secondary">{{ t('btn.analyze') }}</button>
+    </form>
+    {% endif %}
+    {% if issue.ai_recommendation %}
+    <div class="md kb-content" dir="ltr" style="margin-top:10px">{{ issue.ai_recommendation }}</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

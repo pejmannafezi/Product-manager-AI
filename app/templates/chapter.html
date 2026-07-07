@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Chapter {{ chapter.number }} — {{ chapter.title }}{% endblock %}
+{% block content %}
+<p><a href="/knowledge">← {{ t('nav.knowledge') }}</a></p>
+<h1>Chapter {{ chapter.number }}: {{ chapter.title }}</h1>
+
+<div class="card kb-content" dir="ltr" lang="en">
+  {% for s in sections %}
+    {% if s.heading %}<h2 id="s{{ s.id }}">{{ s.heading }}</h2>{% endif %}
+    <div class="md">{{ s.content }}</div>
+  {% endfor %}
+</div>
+{% endblock %}

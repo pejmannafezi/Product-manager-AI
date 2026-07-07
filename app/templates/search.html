@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ t('nav.search') }}</h1>
+
+<form action="/search" method="get" class="stack" style="max-width:640px">
+  <input type="search" name="q" value="{{ q }}" placeholder="{{ t('search.placeholder') }}" autofocus>
+  {% if ai_on %}
+  <label><input type="checkbox" name="deep" value="1" {{ 'checked' if deep }}> {{ t('search.deep') }}</label>
+  {% endif %}
+  <button type="submit">{{ t('nav.search') }}</button>
+</form>
+
+{% if q %}
+<p class="muted">{{ results | length }} {{ t('search.results') }}
+  {% if ai_used %}<span class="badge ai">{{ t('ai.enhanced') }}</span>{% endif %}</p>
+<div class="grid">
+  {% for r in results %}
+  <div class="card kb-content" dir="ltr" lang="en">
+    <a href="/knowledge/chapter/{{ r.chapter_number }}#s{{ r.section_id }}">
+      <strong>Chapter {{ r.chapter_number }}: {{ r.chapter_title }}</strong>
+      {% if r.heading %} › {{ r.heading }}{% endif %}
+    </a>
+    <p>{{ r.snip | safe }}</p>
+  </div>
+  {% else %}
+  <p class="empty">{{ t('dash.none') }}</p>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

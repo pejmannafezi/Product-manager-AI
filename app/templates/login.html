@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card" style="max-width:420px;margin:60px auto">
+  <h1>🔒 {{ t('login.title') }}</h1>
+  {% if error %}<div class="flash-error">{{ t('login.wrong') }}</div>{% endif %}
+  <form class="stack" action="/login" method="post">
+    <label>{{ t('login.password') }}<input type="password" name="password" autofocus required></label>
+    <button type="submit">{{ t('login.enter') }}</button>
+  </form>
+</div>
+{% endblock %}

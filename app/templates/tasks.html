@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ t('nav.tasks') }}</h1>
+
+<form method="get" action="/tasks" class="tabs">
+  <select name="status" onchange="this.form.submit()">
+    <option value="">All statuses</option>
+    {% for s in ['todo','doing','blocked','done'] %}
+    <option value="{{ s }}" {{ 'selected' if status == s }}>{{ s }}</option>
+    {% endfor %}
+  </select>
+  <select name="project_id" onchange="this.form.submit()">
+    <option value="0">All projects</option>
+    {% for p in projects %}
+    <option value="{{ p.id }}" {{ 'selected' if project_id == p.id }}>{{ p.name }}</option>
+    {% endfor %}
+  </select>
+</form>
+
+<div class="grid cols-2">
+  <div class="card">
+    <ul class="clean">
+      {% for task in tasks %}
+      <li class="check-item {{ 'done' if task.status == 'done' }}">
+        <input type="checkbox" data-toggle-url="/api/tasks/{{ task.id }}/toggle" {{ 'checked' if task.status == 'done' }}>
+        <span>
+          <span class="badge {{ task.priority }}">{{ task.priority }}</span>
+          {{ task.title }}
+          <span class="muted">{{ task.project_name or '' }} · {{ task.due_date or '' }} · {{ task.source }}</span>
+        </span>
+      </li>
+      {% else %}<li class="empty">{{ t('dash.none') }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="card">
+    <h2>{{ t('btn.add') }}</h2>
+    <form class="stack" action="/api/tasks" method="post">
+      <label>{{ t('label.title') }}<input type="text" name="title" required></label>
+      <label>{{ t('label.project') }}
+        <select name="project_id"><option value="">—</option>
+          {% for p in projects %}<option value="{{ p.id }}">{{ p.name }}</option>{% endfor %}
+        </select></label>
+      <label>{{ t('label.priority') }}
+        <select name="priority"><option>high</option><option selected>medium</option><option>low</option></select></label>
+      <label>{{ t('label.due') }}<input type="date" name="due_date"></label>
+      <button type="submit">{{ t('btn.save') }}</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
